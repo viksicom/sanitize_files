@@ -1,0 +1,35 @@
+{
+	"name": "sanitize_files",
+	"version": "1.1.1",
+	"description": "Remove all sensitive information from the logs, before sharing them with support",
+	"main": "sanitize_files.js",
+	"dependencies": {
+		"command_line_files": "^1.2.1",
+		"hashmap": "^2.3.0",
+		"locks": "^0.2.2",
+		"mkdirp": "^0.5.1"
+	},
+	"bugs": {
+		"url": "https://github.com/viksicom/sanitize_files/issues"
+	},
+	"keywords": [
+		"file",
+		"log",
+		"sensitive",
+		"sanitize",
+		"mask"
+	],
+	"homepage": "https://github.com/viksicom/sanitize_files",
+	"files": [
+		"sanitize_files.js",
+		"tokensMap.js",
+		"dir_path.js",
+		"whiteList.js"
+	],
+	"author": "viksicom",
+	"license": "GPL-3.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/viksicom/sanitize_files.git"
+	}
+}
