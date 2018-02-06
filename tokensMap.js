@@ -22,7 +22,6 @@ function TokensMap(filename, options, hashMap) {
 	this.opts = options;
 	this.importedTokens = 0;
 	this.addedTokens = 0;
-	
 	this.rwlock = locks.createReadWriteLock();
 
 	this.prepareTokens();
@@ -98,18 +97,17 @@ TokensMap.prototype.loadTokens = function() {
 		if ( line.trim() ) { // If line is not empty
 			lineCount++;
 			try {
-				//console.log("Line "+line_number+" line: "+line);
 				var lineToken = JSON.parse(line);
-				conOut(this.opts, line_number+" token="+lineToken.token+", pattern="+lineToken.pattern);
-				if( !this.isMapped(lineToken.pattern) ) {
-					this.addToMap(lineToken);
+				if( this.addToMap(lineToken) ) {
+					conOut(this.opts, "Importing from line "+line_number+": token="+lineToken.token+", pattern="+lineToken.pattern);
 					tokenCount++;
 				}
 			} catch (Err) {
 				conOut(this.opts, "Line "+line_number+" is not properly formatted. Skipped.");
+				//console.log("Line "+line_number+" line: "+line);
 			}
 		}
-    }
+	}
 	this.importedTokens += tokenCount;
 	if ( lineCount == 0 || tokenCount > 0 ) {
 		return true; // file either empty, or has tokens. In any case, it could be used.
