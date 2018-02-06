@@ -20,4 +20,3 @@ var options = {
 }
 
 sanitize(options);
-console.log(options.stats);
