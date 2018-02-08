@@ -4,7 +4,7 @@ This utility sanitizes log and config files being sent to third parties such as 
 
 Utility finds sensitive information in files and replaces it with tokens. A corresponding token map file is generated to match the replaced sensitive information with its token. By default, sanitize will replace only IP addresses, however, it can utilize any number of regex patterns which are provided as an optional patterns array.
 
-The original files are not modified; instead a new sanitized file is generated and stored either in the same directory as originals or in a separate folder. The location of sanitized files will be dependent on whether `outdir` option is specified and the flags `flatten` and `overwrite` (see more in the `Options` section).
+The original files are not modified; instead a new sanitized file is generated and stored either in the same directory as originals or in a separate folder. The location of sanitized files will be dependent on whether `outdir` option is specified and on the flags `flatten` and `overwrite` (see more in the `Options` section).
 
 The token map file is common for all sanitized files in the corresponding run, but only relevant for that particular set of sanitized files.  Reuse of the token map is an option, but due to the possibility that the actual value of the token could be guessed or obtained over time, it is not advised to be used as a permanent setting.
 
@@ -58,7 +58,7 @@ Review sanitized files in ./sanitized_files folder. If you still see something s
 If you modified options, delete tokens.map and re-run logsSanitize.js
 
 ## sanitize( options )
-Will sanitize information in files list from command line or from option `filesList`.
+Will sanitize information in files, listed as arguments on command line, or from option `filesList`.
 
 * `options` `{Object}`
 
