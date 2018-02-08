@@ -2,7 +2,7 @@
 
 This utility sanitizes log and config files before they are sent to third parties such as support engineers. 
 
-Utility finds sensitive information in files and replaces it with tokens. It also generates a token map file, for the future matches of replaced sensitive information with its token.  
+Utility finds sensitive information in given files and replaces it with tokens. It also generates a token map file, for the future matches of replaced sensitive information with its token.  
 
 By default, sanitize will replace only IP addresses, however, it can use any number of regex patterns provided as an optional patterns array.
 
