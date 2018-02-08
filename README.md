@@ -1,7 +1,11 @@
 # sanitize_files
 
-This utility sanitizes log and config files being sent to third parties such as support engineers. Sensitive information is replaced with tokens and a corresponding token map file is generated to match the replaced sensitive information with its token. By default, sanitize will replace only IP addresses, however, it can utilize any number of regex patterns which are provided as an optional patterns array.
+This utility sanitizes log and config files being sent to third parties such as support engineers. 
+
+Utility finds sensitive information in files and replaces it with tokens. A corresponding token map file is generated to match the replaced sensitive information with its token. By default, sanitize will replace only IP addresses, however, it can utilize any number of regex patterns which are provided as an optional patterns array.
+
 The original files are not modified; instead a new sanitized file is generated and stored either in the same directory as originals or in a separate folder. The location of sanitized files will be dependent on whether `outdir` option is specified and the flags `flatten` and `overwrite` (see more in the `Options` section).
+
 The token map file is common for all sanitized files in the corresponding run, but only relevant for that particular set of sanitized files.  Reuse of the token map is an option, but due to the possibility that the actual value of the token could be guessed or obtained over time, it is not advised to be used as a permanent setting.
 
 
@@ -23,21 +27,35 @@ var options = {
 	{ 	regex: "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",
 		token_name: "ipaddress"
 	},
-	{	regex: "(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\\.test\\.com",
+	{	regex: "(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\\.((test)|(TEST))\\.((com)|(COM))",
 		token_name: "dnsaddress"
 	}],
+	tokenFile: "./tokens.map",
+	reuseTokenFile: true,
+	whiteList: ["127.0.0.1","0.0.0.0","2.1.0.1"],
 	verbose: false,
 	outdir: "./sanitized_files",
-	flatten: true,
-	overwrite: false
+	flatten: false,
+	overwrite: true
 }
 
 sanitize(options);
 ```
+Edit options as needed, save the `logsSanitize.js` file and execute it (make sure to use the proper path to the log files)
 
 ~~~
 node logsSanitize.js ../log_files/*.log ../config_files/*
 ~~~
+
+Review ./tokens.map
+
+If you see something that should not have been sanitized, consider adding it to the whiteList. 
+
+Version numbers are often look like IP address and you may want to whiteList them.
+
+Review sanitized files in ./sanitized_files folder. If you still see something sensitive there, consider adding new or improving existing regex.
+
+If you modified options, delete tokens.map and re-run logsSanitize.js
 
 ## sanitize( options )
 Will sanitize information in files list from command line or from option `filesList`.
