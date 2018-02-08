@@ -1,12 +1,14 @@
 # sanitize_files
 
-This utility sanitizes log and config files being sent to third parties such as support engineers. 
+This utility sanitizes log and config files before they are sent to third parties such as support engineers. 
 
-Utility finds sensitive information in files and replaces it with tokens. A corresponding token map file is generated to match the replaced sensitive information with its token. By default, sanitize will replace only IP addresses, however, it can utilize any number of regex patterns which are provided as an optional patterns array.
+Utility finds sensitive information in files and replaces it with tokens. It also generates a token map file, for the future matches of replaced sensitive information with its token.  
 
-The original files are not modified; instead a new sanitized file is generated and stored either in the same directory as originals or in a separate folder. The location of sanitized files will be dependent on whether `outdir` option is specified and on the flags `flatten` and `overwrite` (see more in the `Options` section).
+By default, sanitize will replace only IP addresses, however, it can use any number of regex patterns provided as an optional patterns array.
 
-The token map file is common for all sanitized files in the corresponding run, but only relevant for that particular set of sanitized files.  Reuse of the token map is an option, but due to the possibility that the actual value of the token could be guessed or obtained over time, it is not advised to be used as a permanent setting.
+The original files are not modified; instead new sanitized files are generated and stored either in the same directory as originals or in a separate folder. The location of sanitized files will depend on whether `outdir` option is specified and on the flags `flatten` and `overwrite` (see more in the `Options` section).
+
+The token map file is common for all sanitized files in the corresponding run, but only relevant for that particular set of sanitized files.  There is an option to reuse the token map, but due to the possibility that the value of the token could be guessed or obtained over time, it is not advised as a permanent setting.
 
 
 ## Usage
@@ -49,7 +51,7 @@ node logsSanitize.js ../log_files/*.log ../config_files/*
 
 Review `./tokens.map`
 
-If you see something that should not have been sanitized, consider adding it to the whiteList. For instance, version numbers are often look like IP address and you may want to keep them untouched.
+If you see something that should not have been sanitized, consider adding it to the whiteList. For instance, version numbers are often look like an IP address and you may want to keep them untouched.
 
 Review sanitized files in `./sanitized_files` folder. If you still see something sensitive there, consider adding new regex pattern or improving existing one.
 
