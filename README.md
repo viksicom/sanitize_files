@@ -47,15 +47,15 @@ Edit options as needed, save the `logsSanitize.js` file and execute it (make sur
 node logsSanitize.js ../log_files/*.log ../config_files/*
 ~~~
 
-Review ./tokens.map
+Review `./tokens.map`
 
 If you see something that should not have been sanitized, consider adding it to the whiteList. 
 
 Version numbers are often look like IP address and you may want to whiteList them.
 
-Review sanitized files in ./sanitized_files folder. If you still see something sensitive there, consider adding new or improving existing regex.
+Review sanitized files in `./sanitized_files` folder. If you still see something sensitive there, consider adding new or improving existing regex.
 
-If you modified options, delete tokens.map and re-run logsSanitize.js
+If you modified options, delete `tokens.map` and re-run `logsSanitize.js`
 
 ## sanitize( options )
 Will sanitize information in files, listed as arguments on command line, or from option `filesList`.
