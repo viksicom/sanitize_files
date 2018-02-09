@@ -19,9 +19,6 @@ npm install --save sanitize_files
 
 Example: logsSanitize.js
 ```javascript
-const sf = require('sanitize_files')
-const sanitize = sf.sanitize
-
 var options = {
 	patterns: [
 	{ 	regex: "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",
@@ -39,7 +36,8 @@ var options = {
 	overwrite: true
 }
 
-sanitize(options);
+const sf = require('sanitize_files')
+sf.sanitize(options);
 ```
 Edit options as needed, save the `logsSanitize.js` file and execute it (make sure to use the proper path to the log files)
 
