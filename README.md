@@ -60,7 +60,7 @@ If you modified `options`, delete `tokens.map` and re-run `logsSanitize.js`
 
 If piped input is detected, the output is automatically redirected to stdout and output options are ignored. 
 
-If you want to pipe the data through `sanitize`, you can use the same logsSanitize.js from the previous example, also you may want to change it a bit to disable regular console outputs. If you still want to have sanitize statistics and information, add a log file as an option for the logger.
+To pipe data through `sanitize`, you can use the same logsSanitize.js from the previous example, also you may want to change it a bit to disable regular console outputs. If you still want to have sanitize statistics and information, add a log file as an option for the logger.
 
 Example: pipeSanitize.js
 ```javascript
