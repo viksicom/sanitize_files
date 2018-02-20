@@ -26,8 +26,10 @@ const wl = require('./whiteList.js')
 const WhiteList = wl.WhiteList
 
 const fs = require('fs');
+const os = require("os");
 const readline = require('readline');
 const clf = require('command_line_files');
+const plr = require('primitive_logger');
 
 var default_options = {
 	patterns: [
@@ -35,10 +37,13 @@ var default_options = {
 		token_name: "ipaddress"
 	}],
 	tokenFile: "replacement_tokens.map",
-	verbose: false,
 	outdir: "sanitized_files",
 	flatten: true,
-	overwrite: false
+	overwrite: false,
+	logger: {
+		format: {date:{show: false},type:{show: true}},
+		outputs: [{file: "stdout",types: ["error","stats"]}]
+	}
 }
 
 function sanitize(opts) {
@@ -51,36 +56,48 @@ function sanitize(opts) {
 	opts.tokensMapInst = new TokensMap(opts.tokenFile, opts);
 	opts.whiteListInst = new WhiteList(opts);
 	
-	var clf_options = {"verbose": opts.verbose};
-	if ( opts.filesList ) {
-		clf_options.filesList = opts.filesList;
+	if (process.stdin.isTTY) {	
+		opts.logger.instance.debug("non-Piped Path...");
+		var clf_options = {logger: opts.logger};
+		if ( opts.filesList ) {
+			clf_options.filesList = opts.filesList;
+		}
+		
+		clf.processEachFile( clf_options, (filename) => {
+			opts.logger.instance.info("Sanitizing file: "+filename);
+
+			const rl = readline.createInterface({
+				input: fs.createReadStream(filename),
+				crlfDelay: Infinity
+			});
+			var outStream = createOutputFile(filename, opts)
+
+			sanitizeStream(filename, rl, outStream, opts);
+		});
+	} else {
+		opts.logger.instance.debug("Pipe detected. Output redirected to stdout...");
+		const rl = readline.createInterface({
+			input: process.stdin,
+			crlfDelay: Infinity
+		});
+		sanitizeStream("stdin", rl, process.stdout, opts)
 	}
-	
-	clf.processEachFile( clf_options, (filename) => {
-		console.log("Sanitizing file: "+filename);
-		sanitizeFile(filename, opts);
-	});
 }
 
-function sanitizeFile(filename, opts) {
+function sanitizeStream(streamId, inStream, outStream, opts) {
 	var line_number=0;
-	var fileStats = {file: filename, newTokens: 0, replacedPatterns: 0, whitelistMatches: 0};
+	var fileStats = {file: streamId, newTokens: 0, replacedPatterns: 0, whitelistMatches: 0};
 	opts.stats.push(fileStats);
 
-	var outFile = createOutputFile(filename, opts)
-	
-	const rl = readline.createInterface({
-		input: fs.createReadStream(filename),
-		crlfDelay: Infinity
+	inStream.on('error', function (err) {
+		opts.logger.instance.error(streamId +" sanitizeStream failed with error: "+err);
+		inStream.close();
+		if (!process.stdout.isTTY) {
+			outStream.close();
+		}
 	});
 
-	rl.on('error', function (err) {
-		console.log(filename +" sanitizeFile failed with error: "+err);
-		rl.close();
-		outFile.close();
-	});
-	
-	rl.on('line', (line) => {
+	inStream.on('line', (line) => {
 		line_number++;
 
 		opts.patterns.forEach( (pattern) => {
@@ -88,14 +105,20 @@ function sanitizeFile(filename, opts) {
 			line=applyLineFilter(line, line_number, pattern_match, pattern.token_name, fileStats, opts);
 		});
 
-		outFile.write(line+"\r");
+		outStream.write(line+os.EOL);
 	});
 
-	rl.on('close', function () {
-		console.log("Completed sanitizing "+line_number +" lines from file "+filename);
-		console.log("   "+fileStats.newTokens+" new tokens; "+fileStats.replacedPatterns+" replaced patterns; "+fileStats.whitelistMatches+" whitelist matches");
-		rl.close();
-		outFile.close();
+	inStream.on('close', () => {
+		opts.logger.instance.stats("Completed sanitizing "+line_number +" lines from file "+streamId);
+		opts.logger.instance.stats("   "+fileStats.newTokens+" new tokens; "+fileStats.replacedPatterns+" replaced patterns; "+fileStats.whitelistMatches+" whitelist matches");
+		inStream.close();
+		if( streamId != 'stdin' ) {
+			try {
+				outStream.close();
+			} catch (Err) {
+				opts.logger.instance.error("Failed to close outStream for "+streamId+"; "+String(Err));
+			}
+		}
 	});
 }
 
@@ -111,7 +134,7 @@ function applyLineFilter(line, line_number, pattern_results, token_prefix, fileS
 					fileStats.newTokens++;
 					replace_token = opts.tokensMapInst.createToken( matched_value, token_prefix+"_"+line_number );
 				}
-				//console.log("Found on line "+line_number+": "+matched_value+"\t replaced it with token: "+replace_token);
+				//opts.logger.instance.debug("Found on line "+line_number+": "+matched_value+"\t replaced it with token: "+replace_token);
 				line = line.replace(matched_value, replace_token);
 			} else {
 				fileStats.whitelistMatches++;
@@ -140,10 +163,6 @@ function prepareOptions( options ) {
 		}
 	});
 
-	if (!typeof opts.verbose === "boolean" ) {
-		opts.verbose = default_options.verbose;
-	} 
-	
 	if (!typeof opts.flatten === "boolean" ) {
 		opts.flatten = default_options.flatten;
 	}
@@ -156,5 +175,13 @@ function prepareOptions( options ) {
 		opts.tokenFile = default_options.tokenFile;
 	}
 
+	if(!options.logger) {
+		opts.logger = {};
+	} else {
+		opts.logger = options.logger;
+	}
+	if (!opts.logger.instance) {
+		opts.logger.instance = new plr.Logger(opts);
+	}
 	return opts;
 }

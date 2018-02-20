@@ -18,7 +18,7 @@ function WhiteList(opts) {
 			var wListFile = JSON.parse(fs.readFileSync(this.whiteListFile, 'utf8'));
 			this.whiteList = this.whiteList.concat(wListFile.whiteList);
 		} catch (Err) {
-			console.log("Failed to read whiteListFile "+this.whiteListFile+" \n"+Err);
+			opts.logger.instance.error("Failed to read whiteListFile "+this.whiteListFile+" \n"+Err);
 		}
 	}
 }

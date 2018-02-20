@@ -6,7 +6,6 @@ const createTokensFile=dir_path.createTokensFile
 const isOnFileSystem=dir_path.isOnFileSystem
 const getTokensFilename=dir_path.getTokensFilename
 const copyFile=dir_path.copyFile
-const conOut = dir_path.conOut
 
 const fs = require('fs');
 const HashMap = require('hashmap');
@@ -20,6 +19,7 @@ function TokensMap(filename, options, hashMap) {
 	}
 	this.tokensFileName = getTokensFilename(filename, options);
 	this.opts = options;
+	this.logger = options.logger.instance;
 	this.importedTokens = 0;
 	this.addedTokens = 0;
 	this.rwlock = locks.createReadWriteLock();
@@ -38,7 +38,7 @@ TokensMap.prototype.addToken = function (token) {
 			if ( this.addToMap(token) ) {
 				var tokenTxt = JSON.stringify(token);
 				this.tokensFile.write(tokenTxt+"\r");
-				conOut(this.opts, "Added token: "+tokenTxt);
+				this.logger.debug("Added token: "+tokenTxt);
 				this.addedTokens++;
 			} 
 			this.rwlock.unlock();
@@ -66,12 +66,12 @@ TokensMap.prototype.prepareTokens = function () {
 		if ( this.opts && this.opts.reuseTokenFile ) {
 			var goodFile = this.loadTokens();
 			if ( !goodFile ) {
-				console.log("Found no tokens in "+this.tokensFileName+" and it is not empty, will not use this file.");
+				this.logger.info("Found no tokens in "+this.tokensFileName+" and it is not empty, will not use this file.");
 				this.opts.reuseTokenFile = false;
 				this.tokensFileName = getTokensFilename(this.tokensFileName, this.opts);
-				console.log("Will store new tokens in "+this.tokensFileName+" instead.");
+				this.logger.info("Will store new tokens in "+this.tokensFileName+" instead.");
 			} else {
-				console.log("Reusing tokens file "+this.tokensFileName+" with "+this.importedTokens+" imported tokens.");
+				this.logger.info("Reusing tokens file "+this.tokensFileName+" with "+this.importedTokens+" imported tokens.");
 			}
 		}
 	} 
@@ -99,12 +99,11 @@ TokensMap.prototype.loadTokens = function() {
 			try {
 				var lineToken = JSON.parse(line);
 				if( this.addToMap(lineToken) ) {
-					conOut(this.opts, "Importing from line "+line_number+": token="+lineToken.token+", pattern="+lineToken.pattern);
+					this.logger.debug("Importing from line "+line_number+": token="+lineToken.token+", pattern="+lineToken.pattern);
 					tokenCount++;
 				}
 			} catch (Err) {
-				conOut(this.opts, "Line "+line_number+" is not properly formatted. Skipped.");
-				//console.log("Line "+line_number+" line: "+line);
+				this.logger.debug("Line "+line_number+" is not properly formatted. Skipped.");
 			}
 		}
 	}

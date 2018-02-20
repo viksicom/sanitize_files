@@ -1,10 +1,11 @@
 {
 	"name": "sanitize_files",
-	"version": "1.1.3",
+	"version": "1.2.0",
 	"description": "Remove all sensitive information from the logs, before sharing them with support",
 	"main": "sanitize_files.js",
 	"dependencies": {
 		"command_line_files": "^1.2.1",
+		"primitive_logger": "^1.0.1",
 		"hashmap": "^2.3.0",
 		"locks": "^0.2.2",
 		"mkdirp": "^0.5.1"

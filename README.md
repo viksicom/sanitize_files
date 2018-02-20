@@ -30,10 +30,13 @@ var options = {
 	tokenFile: "./tokens.map",
 	reuseTokenFile: true,
 	whiteList: ["127.0.0.1","0.0.0.0","2.1.0.1"],
-	verbose: false,
 	outdir: "./sanitized_files",
 	flatten: false,
-	overwrite: true
+	overwrite: false,
+	logger: {
+		format: {date:{show: false},type:{show: true}},
+		outputs: [{file:"stdout",types:["error","stats"]}]
+	}
 }
 
 const sf = require('sanitize_files')
@@ -53,11 +56,53 @@ Review sanitized files in `./sanitized_files` folder. If you still see something
 
 If you modified `options`, delete `tokens.map` and re-run `logsSanitize.js`
 
+### Using pipes
+
+If piped input is detected, the output is automatically redirected to stdout. In this case, all the rest of the output options will be ignored. 
+
+You can use the same logsSanitize.js from the previous example, also you may want to disable console logging outputs, since sanitized results are sent to stdout. If you still want to have sanitize statistics and information, add a log file as an option for the logger.
+
+Example: pipeSanitize.js
+```javascript
+var options = {
+	patterns: [
+	{ 	regex: "((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)",
+		token_name: "ipaddress"
+	},
+	{	regex: "(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])\\.test\\.com",
+		token_name: "dnsaddress"
+	}],
+	tokenFile: "../../data_files/tokens.map",
+	reuseTokenFile: true,
+	whiteList: ["127.0.0.1","0.0.0.0"],
+	logger: {
+		format: {date:{show: false},type:{show: true}},
+		outputs: [
+			{file: "stdout",types: ["error"]},
+			{file: "pipe.log",types: ["error","info","stats","debug"]},
+		]
+	}
+}
+
+const sf = require('./sanitize_files.js')
+const sanitize = sf.sanitize
+sanitize(options);
+```
+Edit options as needed, save the `pipeSanitize.js` file and execute it
+
+Unix
+~~~
+cat ../log_files/my_logs.log | node pipeSanitize.js > ../log_files/my_log.log.sanitized
+~~~
+or Windows
+~~~
+type ../log_files/my_logs.log | node pipeSanitize.js > ../log_files/my_log.log.sanitized
+~~~
+
 ## sanitize( options )
 Will sanitize information in files, listed as arguments on command line, or from option `filesList`.
 
 * `options` `{JASON based Object}`
-
 
 ## Options
 
@@ -65,7 +110,12 @@ Will sanitize information in files, listed as arguments on command line, or from
    * `patterns` -- is an array of regex expressions, that should be used to sanitize information in the files. Default: IP regex only
 		* `regex` -- a valid regular expression - required.
 		* `token_name` -- a prefix for replacement token. Default: 'token'
-   * `verbose` --  if true, will print to console some extra information. Default: false
+   * `verbose` --  replaced with logger. See below.
+   * `logger` - Using `primitive_logger` module. See https://www.npmjs.com/package/primitive_logger for details about logger the options. 
+		* The following types are used: `"error"`, `"stats"`, `"info"`, `"debug"`, `"command_line_files"`.
+		* Default: `outputs: [{file:"stdout",types:["error","stats"]}]`
+		* If logger.instance is set before sanitize is called, that instance will be used instead of creating the new Logger. 
+		* To turn off all outputs, set option `outputs` to empty array: `outputs: []`
    * `tokenFile` -- the filename for the token map. If it is given w/o directory path, the file will be created either in the current directory, or in `outdir` directory (when defined). Default: 'replacement_tokens.map'
    * `reuseTokenFile` -- when true, will import existing tokens from the `tokenFile` and append new tokens to it.
    * `outdir` --  folder to store sanitized files. Default: 'sanitized_files'; If `outdir` is not defined, sanitized files are placed into the same folders with originals, or into the local directory, depending on the `flatten' setting.

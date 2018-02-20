@@ -11,12 +11,16 @@ var options = {
 		token_name: "dnsaddress"
 	}],
 	verbose: false,
-	tokenFile: "../data_files/tokens.map",
+	tokenFile: "../../data_files/tokens.map",
 	reuseTokenFile: true,
 	whiteList: ["127.0.0.1","0.0.0.0"],
-	outdir: "../data_files/sanitized_files",
+	outdir: "../../data_files/sanitized_files",
 	flatten: true,
-	overwrite: true
+	overwrite: true,
+	logger: {
+		format: {date:{show: false},type:{show: true}},
+		outputs: [{file: "stdout",types: ["error","stats","info"]}]
+	}
 }
 
 sanitize(options);

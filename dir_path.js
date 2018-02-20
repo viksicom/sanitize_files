@@ -6,8 +6,6 @@ exports.getTokensFilename = getTokensFilename
 exports.createDirectory = createDirectory
 exports.isOnFileSystem = isOnFileSystem
 exports.copyFile = copyFile
-exports.conOut = conOut
-exports.conDebug = conDebug
 
 const path = require('path');
 const fs = require('fs');
@@ -71,7 +69,7 @@ function createOutputFile(filename, opts) {
 	}
 	var outfilename = getValidFileName(directory, name, extention, opts.overwrite, opts);
 	
-	conOut(opts, "Creating output file: "+outfilename);
+	opts.logger.instance.info("Creating output file: "+outfilename);
 	return createFile(outfilename,'w');
 }
 
@@ -100,16 +98,16 @@ function createTokensFile(filename, opts) {
 	var flags = 'w';
 	if(opts.reuseTokenFile) {
 		flags = 'a';
-		conOut(opts, "Opening tokens map file: "+filename);
+		opts.logger.instance.debug("Opening tokens map file: "+filename);
 	} else {
-		conOut(opts, "Creating tokens map file: "+filename);
+		opts.logger.instance.debug("Creating tokens map file: "+filename);
 	}
 	return createFile(filename,flags);
 }
 
 function getValidFileName(directory, name, extention, overwriteFlag, opts) {
 	var outfilename = directory+path.sep+name+extention;
-	conDebug( opts, "getValidFileName overwriteFlag="+overwriteFlag+"; checking filename: "+outfilename);
+	opts.logger.instance.debug("getValidFileName overwriteFlag="+overwriteFlag+"; checking filename: "+outfilename);
 	if ( !overwriteFlag ) {
 		var count=0;
 		while ( isOnFileSystem(outfilename) ) {
@@ -117,7 +115,7 @@ function getValidFileName(directory, name, extention, overwriteFlag, opts) {
 			outfilename = directory+path.sep+name+"("+count+")"+extention;
 		}
 	}
-	conDebug(opts, "getValidFileName file to use: "+outfilename);
+	opts.logger.instance.debug("getValidFileName file to use: "+outfilename);
 	return outfilename;
 }
 
@@ -147,22 +145,9 @@ function createDirectory(dir, opts) {
 	if( dir && !fs.existsSync(dir) ) {
 		mkdirp.sync(dir);
 		if(fs.existsSync(dir)) {
-			conOut(opts, "Successfully created directory "+dir);
+			opts.logger.instance.info("Successfully created directory "+dir);
 		} else {
 			// !! some kind of error
 		}
 	}
 }
-
-function conOut(opts, data) {
-	if (opts && opts.verbose) {
-		console.log(data);
-	}
-}
-
-function conDebug(opts, data) {
-	if (opts && opts.debug) {
-		console.log(data);
-	}
-}
-
