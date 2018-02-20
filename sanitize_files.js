@@ -49,15 +49,16 @@ var default_options = {
 function sanitize(opts) {
 	opts = prepareOptions( opts );
 
-	if (opts.outdir) {
-		createDirectory(opts.outdir, opts);
-	}
-
 	opts.tokensMapInst = new TokensMap(opts.tokenFile, opts);
 	opts.whiteListInst = new WhiteList(opts);
 	
 	if (process.stdin.isTTY) {	
 		opts.logger.instance.debug("non-Piped Path...");
+
+		if (opts.outdir) {
+			createDirectory(opts.outdir, opts);
+		}
+
 		var clf_options = {logger: opts.logger};
 		if ( opts.filesList ) {
 			clf_options.filesList = opts.filesList;
