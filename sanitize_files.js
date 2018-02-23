@@ -8,12 +8,6 @@ module.exports = {
     sanitize: sanitize
 };
 
-/*
-if (process.argv.length <= 2) {
-    console.log("Usage: " + __filename + " list of files fo sanitize");
-    process.exit(-1);
-}
-*/
 const dir_path = require('./dir_path.js')
 const createOutputFile = dir_path.createOutputFile
 const createDirectory = dir_path.createDirectory
@@ -148,13 +142,13 @@ function applyLineFilter(line, line_number, pattern_results, token_prefix, fileS
 function prepareOptions( options ) {
 	var opts = options;
 	if (!options) {
-		opts = default_options;
+		opts = JSON.parse(JSON.stringify(default_options));
 	} 
 	
 	opts.stats = [];
 	
 	if (!opts.patterns) {
-		opts.patterns = default_options.patterns;
+		opts.patterns = JSON.parse(JSON.stringify(default_options.patterns));
 	}
 	
 	opts.patterns.forEach( (pattern) => {
