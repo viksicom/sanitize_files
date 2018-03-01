@@ -17,7 +17,7 @@ Install with npm
 npm install --save sanitize_files
 ```
 
-Example: logsSanitize.js
+Example: sanitizeLogs.js
 ```javascript
 var options = {
 	patterns: [
@@ -42,10 +42,10 @@ var options = {
 const sf = require('sanitize_files')
 sf.sanitize(options);
 ```
-Edit options as needed, save the `logsSanitize.js` file and execute it (make sure to use the proper path to the log files)
+Edit options as needed, save the `sanitizeLogs.js` file and execute it (make sure to use the proper path to the log files)
 
 ~~~
-node logsSanitize.js ../log_files/*.log ../config_files/*
+node sanitizeLogs.js ../log_files/*.log ../config_files/*
 ~~~
 
 Review `./tokens.map`
@@ -54,15 +54,15 @@ If you see something that should not have been sanitized, consider adding it to 
 
 Review sanitized files in `./sanitized_files` folder. If you still see something sensitive there, consider adding new regex pattern or improving existing one.
 
-If you modified `options`, delete `tokens.map` and re-run `logsSanitize.js`
+If you modified `options`, delete `tokens.map` and re-run `sanitizeLogs.js`
 
 ### Using pipes
 
 If piped input is detected, the output is automatically redirected to stdout and output options are ignored. 
 
-To pipe data through `sanitize`, you can use the same logsSanitize.js from the previous example, also you may want to change it a bit to disable regular console outputs. If you still want to have sanitize statistics and information, add a log file as an option for the logger.
+To pipe data through `sanitize`, you can use the same sanitizeLogs.js from the previous example, also you may want to change it a bit to disable regular console outputs. If you still want to have sanitize statistics and information, add a log file as an option for the logger.
 
-Example: pipeSanitize.js
+Example: sanitizePipe.js
 ```javascript
 var options = {
 	patterns: [
@@ -76,7 +76,7 @@ var options = {
 	reuseTokenFile: true,
 	whiteList: ["127.0.0.1","0.0.0.0"],
 	logger: {
-		format: {date:{show: false},type:{show: true}},
+		format: {type:{show: true}},
 		outputs: [
 			{file: "stdout",types: ["error"]},
 			{file: "pipe.log",types: ["error","info","stats","debug"]},
@@ -84,19 +84,18 @@ var options = {
 	}
 }
 
-const sf = require('./sanitize_files.js')
-const sanitize = sf.sanitize
-sanitize(options);
+const sf = require('sanitize_files')
+sf.sanitize(options);
 ```
-Edit options as needed, save the `pipeSanitize.js` file and execute it
+Edit options as needed, save the `sanitizePipe.js` file and execute it
 
 Unix
 ~~~
-cat ../log_files/my_logs.log | node pipeSanitize.js > ../log_files/my_log.log.sanitized
+cat ../log_files/my_logs.log | node sanitizePipe.js > ../log_files/my_log.log.sanitized
 ~~~
 or Windows
 ~~~
-type ../log_files/my_logs.log | node pipeSanitize.js > ../log_files/my_log.log.sanitized
+type ../log_files/my_logs.log | node sanitizePipe.js > ../log_files/my_log.log.sanitized
 ~~~
 
 ## sanitize( options )

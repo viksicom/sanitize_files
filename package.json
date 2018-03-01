@@ -1,6 +1,6 @@
 {
 	"name": "sanitize_files",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "Remove all sensitive information from the logs, before sharing them with support",
 	"main": "sanitize_files.js",
 	"dependencies": {
@@ -25,7 +25,8 @@
 		"sanitize_files.js",
 		"tokensMap.js",
 		"dir_path.js",
-		"whiteList.js"
+		"whiteList.js",
+		"test.js"
 	],
 	"author": "viksicom",
 	"license": "GPL-3.0",
