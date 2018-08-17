@@ -124,7 +124,8 @@ Will sanitize information in files, listed as arguments on command line, or from
    * `overwrite` -- if false, will check if the same output file already exists and create a new file with different name. Default: false
    * `filesList` -- when provided, utility will use this list instead of looking for command line arguments. Example: `filesList: ["logs/*.log","confs/*"]`
    * `whiteList` -- an optional array of strings that should not be sanitized. Example: `whiteList: ["127.0.0.1","test.com"]`
-   * `whiteListFile` -- a file, containing the `whiteList` array of strings. If both `whiteList` and `whiteListFile` are specified, arrays will be combined. 
+   * `whiteListFile` -- a file, containing the `whiteList` array of strings. If both `whiteList` and `whiteListFile` are specified, arrays will be combined.
+   * `scanDirs` - when true and directory is entered on command line, will recursively scan this directory for files, to include them into processing set. Default: true   
    
 Example of `whiteListFile`
 ```

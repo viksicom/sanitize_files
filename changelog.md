@@ -1,6 +1,7 @@
 ## 1.2.#
 - Added logic to process piped input. When pipe is detected, output is automatically redirected to stdout
 - Intergated with primitive_logger module
+- Added scanDirs option. Comes with new option in command_line_files@1.3.3
 
 ## 1.1.x
 
